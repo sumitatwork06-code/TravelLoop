@@ -3,6 +3,7 @@ services:
   - type: web
     name: travelloop
     env: node
+    plan: free
     buildCommand: cd frontend && npm install && npm run build && cd ../backend && npm install
     startCommand: cd backend && node server.js
     healthCheckPath: /api/health
