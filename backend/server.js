@@ -64,6 +64,7 @@ async function connectDB() {
     // Try connecting to the configured MongoDB first
     await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 3000 });
     console.log('✅ MongoDB connected (external)');
+    await seedDemoData();
   } catch (err) {
     console.log('⚠️  Could not connect to MongoDB at:', MONGODB_URI);
     console.log('🔄 Starting MongoDB Memory Server (in-memory, data resets on restart)...\n');
@@ -82,11 +83,17 @@ async function connectDB() {
   }
 }
 
-// ─── Auto-seed for in-memory mode ─────────────────────────────────
+// ─── Auto-seed for in-memory & fresh DB mode ──────────────────────
 async function seedDemoData() {
   const User = require('./models/User');
   const Trip = require('./models/Trip');
   const crypto = require('crypto');
+
+  const existing = await User.findOne({ email: 'demo@traveloop.com' });
+  if (existing) {
+    console.log('🌱 Demo data already initialized');
+    return;
+  }
 
   // Create demo user
   const demoUser = new User({
